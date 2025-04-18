@@ -32,7 +32,12 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define TRANSMITTER
+#define LORA_NSS_GPIO_Port GPIOF
+#define LORA_NSS_Pin       GPIO_PIN_12
+#define LORA_RST_GPIO_Port GPIOF
+#define LORA_RST_Pin       GPIO_PIN_13
+//#define RECEIVER
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -58,7 +63,8 @@ UART_HandleTypeDef huart1;
 SDRAM_HandleTypeDef hsdram1;
 
 /* USER CODE BEGIN PV */
-
+uint8_t TX_Buffer [] = "EDOUARD" ;
+uint8_t RX_Buffer [1] ; // DATA to receive
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -80,7 +86,85 @@ void MX_USB_HOST_Process(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void serial_print(char* str)
+{
+	HAL_UART_Transmit(&huart1, (uint8_t *)str, strlen(str), HAL_MAX_DELAY);
+}
 
+void write_register(uint8_t addr, uint8_t value)
+{
+    uint8_t data[2];
+    data[0] = addr | 0x80; // bit 7 à 1 pour écriture
+    data[1] = value;
+
+    HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_RESET); // NSS low
+    HAL_SPI_Transmit(&hspi5, data, 2, HAL_MAX_DELAY);
+    HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_SET);   // NSS high
+}
+
+void init_lora(void)
+{
+	// Mettre en veille (obligatoire avant les changements de mode)
+	write_register(0x01, 0x80); // Sleep mode + LoRa
+
+	// Choisir fréquence (ici pour 868 MHz)
+	write_register(0x06, 0xD9); // RegFrfMsb = 868 MHz
+	write_register(0x07, 0x06);
+	write_register(0x08, 0x66);
+
+	// Puissance d’émission (PA_BOOST, 17 dBm)
+	write_register(0x09, 0x8F); // RegPaConfig
+
+	// Paramètres LoRa (BW=125 kHz, CR=4/5, SF=7)
+	write_register(0x1D, 0x72); // RegModemConfig1: BW=125kHz, CR=4/5, explicit header
+	write_register(0x1E, 0x74); // RegModemConfig2: SF=7, CRC On
+	write_register(0x26, 0x04); // RegModemConfig3: LowDataRateOptimize=OFF
+
+	// Configuration de la FIFO
+	write_register(0x0E, 0x80); // RegFifoTxBaseAddr
+	write_register(0x0D, 0x80); // RegFifoAddrPtr
+	unsigned char size = 7;
+	write_register(0x22, size); // RegPayloadLength (taille du message)
+
+	// Écriture des données dans le FIFO
+	for (int i = 0; i < size; i++) {
+	  write_register(0x00, TX_Buffer[i]); // RegFifo
+	}
+
+	// Passage en mode émetteur
+	write_register(0x01, 0x83); // TX mode + LoRa
+}
+
+void lora_reset(void)
+{
+    HAL_GPIO_WritePin(LORA_RST_GPIO_Port, LORA_RST_Pin, GPIO_PIN_RESET);
+    HAL_Delay(10); // maintenir RESET à 0 pendant 10ms
+    HAL_GPIO_WritePin(LORA_RST_GPIO_Port, LORA_RST_Pin, GPIO_PIN_SET);
+    HAL_Delay(10); // attendre encore un peu après le relâchement
+}
+
+uint8_t lora_version(void)
+{
+	uint8_t version = 0;
+	uint8_t addr = 0x42; // RegVersion
+
+	HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_RESET);
+	HAL_SPI_Transmit(&hspi5, &addr, 1, HAL_MAX_DELAY);
+	HAL_SPI_Receive(&hspi5, &version, 1, HAL_MAX_DELAY);
+	HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_SET);
+
+	char buf[32];
+	snprintf(buf, sizeof(buf), "RegVersion = 0x%02X\r\n", version);
+	serial_print(buf);
+
+	if (version == 0x12) {
+		serial_print("RFM95 détecté\r\n");
+	} else {
+		serial_print("Erreur RFM95 !\r\n");
+	}
+
+	return version;
+}
 /* USER CODE END 0 */
 
 /**
@@ -122,6 +206,14 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
+#ifdef RECEIVER
+#endif
+
+#ifdef TRANSMITTER
+  lora_reset();
+  init_lora();
+  lora_version();
+#endif
 
   /* USER CODE END 2 */
 
@@ -133,8 +225,12 @@ int main(void)
     MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-    HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
-    HAL_Delay(1000); // Delay for 1 second
+
+#ifdef RECEIVER
+#endif
+
+#ifdef TRANSMITTER
+#endif
   }
   /* USER CODE END 3 */
 }
@@ -494,7 +590,7 @@ static void MX_FMC_Init(void)
   /* hsdram1.Init */
   hsdram1.Init.SDBank = FMC_SDRAM_BANK2;
   hsdram1.Init.ColumnBitsNumber = FMC_SDRAM_COLUMN_BITS_NUM_8;
-  hsdram1.Init.RowBitsNumber = FMC_SDRAM_ROW_BITS_NUM_12;
+  hsdram1.Init.RowBitsNumber = FMC_SDRAM_ROW_BITS_NUM_11;
   hsdram1.Init.MemoryDataWidth = FMC_SDRAM_MEM_BUS_WIDTH_16;
   hsdram1.Init.InternalBankNumber = FMC_SDRAM_INTERN_BANKS_NUM_4;
   hsdram1.Init.CASLatency = FMC_SDRAM_CAS_LATENCY_3;
@@ -550,6 +646,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(ACP_RST_GPIO_Port, ACP_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOF, GPIO_PIN_12|GPIO_PIN_13, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, RDX_Pin|WRX_DCX_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -586,6 +685,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(BOOT1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PF12 PF13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
   /*Configure GPIO pin : TE_Pin */
   GPIO_InitStruct.Pin = TE_Pin;
