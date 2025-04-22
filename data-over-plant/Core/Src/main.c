@@ -34,7 +34,7 @@
 /* USER CODE BEGIN PD */
 #define TRANSMITTER
 #define LORA_NSS_GPIO_Port GPIOF
-#define LORA_NSS_Pin       GPIO_PIN_12
+#define LORA_NSS_Pin       GPIO_PIN_6
 #define LORA_RST_GPIO_Port GPIOF
 #define LORA_RST_Pin       GPIO_PIN_13
 //#define RECEIVER
@@ -102,6 +102,19 @@ void write_register(uint8_t addr, uint8_t value)
     HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_SET);   // NSS high
 }
 
+uint8_t read_register(uint8_t addr)
+{
+    uint8_t value = 0;
+    uint8_t reg_addr = addr & 0x7F; // bit 7 à 0 pour lecture (mask pour s'assurer que le bit 7 est à 0)
+
+    HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_RESET); // NSS low
+    HAL_SPI_Transmit(&hspi5, &reg_addr, 1, HAL_MAX_DELAY); // Envoyer l'adresse du registre
+    HAL_SPI_Receive(&hspi5, &value, 1, HAL_MAX_DELAY);     // Lire la valeur du registre
+    HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_SET);   // NSS high
+
+    return value;
+}
+
 void init_lora(void)
 {
 	// Mettre en veille (obligatoire avant les changements de mode)
@@ -145,13 +158,7 @@ void lora_reset(void)
 
 uint8_t lora_version(void)
 {
-	uint8_t version = 0;
-	uint8_t addr = 0x42; // RegVersion
-
-	HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi5, &addr, 1, HAL_MAX_DELAY);
-	HAL_SPI_Receive(&hspi5, &version, 1, HAL_MAX_DELAY);
-	HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_SET);
+	uint8_t version = read_register(0x42);
 
 	char buf[32];
 	snprintf(buf, sizeof(buf), "RegVersion = 0x%02X\r\n", version);
@@ -211,7 +218,7 @@ int main(void)
 
 #ifdef TRANSMITTER
   lora_reset();
-  init_lora();
+  //init_lora();
   lora_version();
 #endif
 
@@ -640,19 +647,26 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6|GPIO_PIN_12|GPIO_PIN_13, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, NCS_MEMS_SPI_Pin|CSX_Pin|OTG_FS_PSO_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(ACP_RST_GPIO_Port, ACP_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOF, GPIO_PIN_12|GPIO_PIN_13, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, RDX_Pin|WRX_DCX_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, LD3_Pin|LD4_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : PF6 PF12 PF13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_12|GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
   /*Configure GPIO pins : NCS_MEMS_SPI_Pin CSX_Pin OTG_FS_PSO_Pin */
   GPIO_InitStruct.Pin = NCS_MEMS_SPI_Pin|CSX_Pin|OTG_FS_PSO_Pin;
@@ -685,13 +699,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(BOOT1_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PF12 PF13 */
-  GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
   /*Configure GPIO pin : TE_Pin */
   GPIO_InitStruct.Pin = TE_Pin;
