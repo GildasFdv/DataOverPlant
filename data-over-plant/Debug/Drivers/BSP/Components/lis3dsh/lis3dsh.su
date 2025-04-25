@@ -1,0 +1,10 @@
+../Drivers/BSP/Components/lis3dsh/lis3dsh.c:104:6:LIS3DSH_Init	24	static
+../Drivers/BSP/Components/lis3dsh/lis3dsh.c:129:6:LIS3DSH_DeInit	4	static
+../Drivers/BSP/Components/lis3dsh/lis3dsh.c:139:9:LIS3DSH_ReadID	16	static
+../Drivers/BSP/Components/lis3dsh/lis3dsh.c:159:6:LIS3DSH_InterruptConfig	24	static
+../Drivers/BSP/Components/lis3dsh/lis3dsh.c:191:6:LIS3DSH_Click_IntConfig	16	static
+../Drivers/BSP/Components/lis3dsh/lis3dsh.c:249:6:LIS3DSH_ODR_LowpowerCmd	24	static
+../Drivers/BSP/Components/lis3dsh/lis3dsh.c:279:6:LIS3DSH_DataRateCmd	24	static
+../Drivers/BSP/Components/lis3dsh/lis3dsh.c:305:6:LIS3DSH_FullScaleCmd	24	static
+../Drivers/BSP/Components/lis3dsh/lis3dsh.c:325:6:LIS3DSH_RebootCmd	16	static
+../Drivers/BSP/Components/lis3dsh/lis3dsh.c:344:6:LIS3DSH_ReadACC	40	static

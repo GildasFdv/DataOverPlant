@@ -620,6 +620,86 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
 
 }
 
+/**
+  * @brief HCD MSP Initialization
+  * This function configures the hardware resources used in this example
+  * @param hhcd: HCD handle pointer
+  * @retval None
+  */
+void HAL_HCD_MspInit(HCD_HandleTypeDef* hhcd)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  if(hhcd->Instance==USB_OTG_HS)
+  {
+    /* USER CODE BEGIN USB_OTG_HS_MspInit 0 */
+
+    /* USER CODE END USB_OTG_HS_MspInit 0 */
+
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    /**USB_OTG_HS GPIO Configuration
+    PB12     ------> USB_OTG_HS_ID
+    PB13     ------> USB_OTG_HS_VBUS
+    PB14     ------> USB_OTG_HS_DM
+    PB15     ------> USB_OTG_HS_DP
+    */
+    GPIO_InitStruct.Pin = OTG_HS_ID_Pin|OTG_HS_DM_Pin|OTG_HS_DP_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Alternate = GPIO_AF12_OTG_HS_FS;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = VBUS_HS_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(VBUS_HS_GPIO_Port, &GPIO_InitStruct);
+
+    /* Peripheral clock enable */
+    __HAL_RCC_USB_OTG_HS_CLK_ENABLE();
+    /* USB_OTG_HS interrupt Init */
+    HAL_NVIC_SetPriority(OTG_HS_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(OTG_HS_IRQn);
+    /* USER CODE BEGIN USB_OTG_HS_MspInit 1 */
+
+    /* USER CODE END USB_OTG_HS_MspInit 1 */
+
+  }
+
+}
+
+/**
+  * @brief HCD MSP De-Initialization
+  * This function freeze the hardware resources used in this example
+  * @param hhcd: HCD handle pointer
+  * @retval None
+  */
+void HAL_HCD_MspDeInit(HCD_HandleTypeDef* hhcd)
+{
+  if(hhcd->Instance==USB_OTG_HS)
+  {
+    /* USER CODE BEGIN USB_OTG_HS_MspDeInit 0 */
+
+    /* USER CODE END USB_OTG_HS_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_USB_OTG_HS_CLK_DISABLE();
+
+    /**USB_OTG_HS GPIO Configuration
+    PB12     ------> USB_OTG_HS_ID
+    PB13     ------> USB_OTG_HS_VBUS
+    PB14     ------> USB_OTG_HS_DM
+    PB15     ------> USB_OTG_HS_DP
+    */
+    HAL_GPIO_DeInit(GPIOB, OTG_HS_ID_Pin|VBUS_HS_Pin|OTG_HS_DM_Pin|OTG_HS_DP_Pin);
+
+    /* USB_OTG_HS interrupt DeInit */
+    HAL_NVIC_DisableIRQ(OTG_HS_IRQn);
+    /* USER CODE BEGIN USB_OTG_HS_MspDeInit 1 */
+
+    /* USER CODE END USB_OTG_HS_MspDeInit 1 */
+  }
+
+}
+
 static uint32_t FMC_Initialized = 0;
 
 static void HAL_FMC_MspInit(void){
@@ -644,7 +724,6 @@ static void HAL_FMC_MspInit(void){
   PF5   ------> FMC_A5
   PC0   ------> FMC_SDNWE
   PF11   ------> FMC_SDNRAS
-  PF14   ------> FMC_A8
   PF15   ------> FMC_A9
   PG0   ------> FMC_A10
   PG1   ------> FMC_A11
@@ -674,8 +753,7 @@ static void HAL_FMC_MspInit(void){
   PE1   ------> FMC_NBL1
   */
   GPIO_InitStruct.Pin = A0_Pin|A1_Pin|A2_Pin|A3_Pin
-                          |A4_Pin|A5_Pin|SDNRAS_Pin|A8_Pin
-                          |A9_Pin;
+                          |A4_Pin|A5_Pin|SDNRAS_Pin|A9_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -758,7 +836,6 @@ static void HAL_FMC_MspDeInit(void){
   PF5   ------> FMC_A5
   PC0   ------> FMC_SDNWE
   PF11   ------> FMC_SDNRAS
-  PF14   ------> FMC_A8
   PF15   ------> FMC_A9
   PG0   ------> FMC_A10
   PG1   ------> FMC_A11
@@ -788,8 +865,7 @@ static void HAL_FMC_MspDeInit(void){
   PE1   ------> FMC_NBL1
   */
   HAL_GPIO_DeInit(GPIOF, A0_Pin|A1_Pin|A2_Pin|A3_Pin
-                          |A4_Pin|A5_Pin|SDNRAS_Pin|A8_Pin
-                          |A9_Pin);
+                          |A4_Pin|A5_Pin|SDNRAS_Pin|A9_Pin);
 
   HAL_GPIO_DeInit(SDNWE_GPIO_Port, SDNWE_Pin);
 

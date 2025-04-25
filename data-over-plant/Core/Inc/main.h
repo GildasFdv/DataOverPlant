@@ -117,8 +117,6 @@ void Error_Handler(void);
 #define BOOT1_GPIO_Port GPIOB
 #define SDNRAS_Pin GPIO_PIN_11
 #define SDNRAS_GPIO_Port GPIOF
-#define A8_Pin GPIO_PIN_14
-#define A8_GPIO_Port GPIOF
 #define A9_Pin GPIO_PIN_15
 #define A9_GPIO_Port GPIOF
 #define A10_Pin GPIO_PIN_0

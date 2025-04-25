@@ -1,0 +1,16 @@
+../Drivers/BSP/Components/ft3x67/ft3x67.c:114:6:ft3x67_Init	16	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:126:6:ft3x67_Reset	16	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:138:10:ft3x67_ReadID	16	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:152:6:ft3x67_TS_Start	16	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:169:9:ft3x67_TS_DetectTouch	24	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:201:6:ft3x67_TS_GetXY	32	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:242:6:ft3x67_TS_EnableIT	16	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:254:6:ft3x67_TS_DisableIT	16	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:268:9:ft3x67_TS_ITStatus	16	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:281:6:ft3x67_TS_ClearIT	16	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:293:6:ft3x67_TS_GestureConfig	16	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:315:6:ft3x67_TS_GetGestureID	24	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:339:6:ft3x67_TS_GetTouchInfo	32	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:388:16:ft3x67_Get_I2C_InitializedStatus	4	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:398:13:ft3x67_I2C_InitializeIfRequired	8	static
+../Drivers/BSP/Components/ft3x67/ft3x67.c:415:17:ft3x67_TS_Configure	24	static

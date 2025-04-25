@@ -1,0 +1,4 @@
+../Drivers/BSP/Components/ov2640/ov2640.c:1029:6:ov2640_Init	9
+../Drivers/BSP/Components/ov2640/ov2640.c:1095:6:ov2640_Config	5
+../Drivers/BSP/Components/ov2640/ov2640.c:1155:10:ov2640_ReadID	1
+../Drivers/BSP/Components/ov2640/ov2640.c:1176:17:ov2640_ConvertValue	23

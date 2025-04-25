@@ -1,0 +1,12 @@
+../Drivers/BSP/Components/ft6x06/ft6x06.c:113:6:ft6x06_Init	3
+../Drivers/BSP/Components/ft6x06/ft6x06.c:144:6:ft6x06_Reset	1
+../Drivers/BSP/Components/ft6x06/ft6x06.c:156:10:ft6x06_ReadID	1
+../Drivers/BSP/Components/ft6x06/ft6x06.c:172:6:ft6x06_TS_Start	1
+../Drivers/BSP/Components/ft6x06/ft6x06.c:194:9:ft6x06_TS_DetectTouch	2
+../Drivers/BSP/Components/ft6x06/ft6x06.c:226:6:ft6x06_TS_GetXY	4
+../Drivers/BSP/Components/ft6x06/ft6x06.c:265:6:ft6x06_TS_EnableIT	1
+../Drivers/BSP/Components/ft6x06/ft6x06.c:280:6:ft6x06_TS_DisableIT	1
+../Drivers/BSP/Components/ft6x06/ft6x06.c:297:9:ft6x06_TS_ITStatus	1
+../Drivers/BSP/Components/ft6x06/ft6x06.c:310:6:ft6x06_TS_ClearIT	1
+../Drivers/BSP/Components/ft6x06/ft6x06.c:448:17:ft6x06_TS_Configure	1
+../Drivers/BSP/Components/ft6x06/ft6x06.c:463:16:ft6x06_GetInstance	3

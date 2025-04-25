@@ -1,0 +1,12 @@
+../Drivers/BSP/Components/lis302dl/lis302dl.c:106:6:LIS302DL_Init	24	static
+../Drivers/BSP/Components/lis302dl/lis302dl.c:124:6:LIS302DL_DeInit	4	static
+../Drivers/BSP/Components/lis302dl/lis302dl.c:134:9:LIS302DL_ReadID	16	static
+../Drivers/BSP/Components/lis302dl/lis302dl.c:153:6:LIS302DL_FilterConfig	24	static
+../Drivers/BSP/Components/lis302dl/lis302dl.c:177:6:LIS302DL_InterruptConfig	24	static
+../Drivers/BSP/Components/lis302dl/lis302dl.c:198:6:LIS302DL_Click_IntConfig	16	static
+../Drivers/BSP/Components/lis302dl/lis302dl.c:250:6:LIS302DL_Click_IntClear	24	static
+../Drivers/BSP/Components/lis302dl/lis302dl.c:267:6:LIS302DL_LowpowerCmd	24	static
+../Drivers/BSP/Components/lis302dl/lis302dl.c:290:6:LIS302DL_DataRateCmd	24	static
+../Drivers/BSP/Components/lis302dl/lis302dl.c:313:6:LIS302DL_FullScaleCmd	24	static
+../Drivers/BSP/Components/lis302dl/lis302dl.c:333:6:LIS302DL_RebootCmd	16	static
+../Drivers/BSP/Components/lis302dl/lis302dl.c:352:6:LIS302DL_ReadACC	40	static

@@ -1,0 +1,16 @@
+../Drivers/BSP/Components/ili9325/ili9325.c:105:6:ili9325_Init	8	static
+../Drivers/BSP/Components/ili9325/ili9325.c:198:6:ili9325_DisplayOn	8	static
+../Drivers/BSP/Components/ili9325/ili9325.c:223:6:ili9325_DisplayOff	8	static
+../Drivers/BSP/Components/ili9325/ili9325.c:242:10:ili9325_GetLcdPixelWidth	4	static
+../Drivers/BSP/Components/ili9325/ili9325.c:252:10:ili9325_GetLcdPixelHeight	4	static
+../Drivers/BSP/Components/ili9325/ili9325.c:262:10:ili9325_ReadID	8	static
+../Drivers/BSP/Components/ili9325/ili9325.c:274:6:ili9325_SetCursor	16	static
+../Drivers/BSP/Components/ili9325/ili9325.c:287:6:ili9325_WritePixel	16	static
+../Drivers/BSP/Components/ili9325/ili9325.c:304:10:ili9325_ReadPixel	16	static
+../Drivers/BSP/Components/ili9325/ili9325.c:319:6:ili9325_WriteReg	16	static
+../Drivers/BSP/Components/ili9325/ili9325.c:332:10:ili9325_ReadReg	16	static
+../Drivers/BSP/Components/ili9325/ili9325.c:346:6:ili9325_SetDisplayWindow	24	static
+../Drivers/BSP/Components/ili9325/ili9325.c:367:6:ili9325_DrawHLine	32	static
+../Drivers/BSP/Components/ili9325/ili9325.c:394:6:ili9325_DrawVLine	32	static
+../Drivers/BSP/Components/ili9325/ili9325.c:431:6:ili9325_DrawBitmap	24	static
+../Drivers/BSP/Components/ili9325/ili9325.c:470:6:ili9325_DrawRGBImage	32	static
