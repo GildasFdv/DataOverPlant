@@ -195,16 +195,6 @@ LoRaPacket_t lora_receive_packet(void)
             packet.buffer[i] = read_register(0x00); // RegFifo
         }
 
-        // Afficher les informations de réception
-        //char buf[128];
-        //snprintf(buf, sizeof(buf), "Paquet reçu (%d octets), RSSI: %d dBm, SNR: %.2f dB\r\n", packet.size, packet.rssi, packet.snr);
-        //serial_print(buf);
-
-        // Afficher le contenu du paquet (en ASCII)
-        /*serial_print("Contenu: ");
-        serial_print(packet.buffer);
-        serial_print("\r\n");*/
-
         // Effacer le drapeau RxDone
         write_register(0x12, 0x40);
     }

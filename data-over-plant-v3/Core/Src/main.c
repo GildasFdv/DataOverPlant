@@ -153,50 +153,23 @@ int main(void)
   reset_led4();
   reset_led3();
 
+	bool lora_init = false;
+
+	while (!lora_init) {
+		lora_reset();
+		HAL_Delay(10);
+
+		uint8_t version = lora_version();
+		if (version == 0x12) {
+			set_led3();
+			init_lora();
+			lora_init = true;
+		}
+	}
 #ifdef RECEIVER
-    lora_reset();
-    HAL_Delay(10);
-
-    uint8_t version = lora_version();
-    if (version == 0x12) {
-  	  set_led3();
-        serial_print("Initialisation du module LoRa...\r\n");
-
-        init_lora();
-    } else {
-        serial_print("Module LoRa non detecte ou incompatible\r\n");
-        char buf[32];
-    	snprintf(buf, sizeof(buf), "RegVersion = 0x%02X\r\n", version);
-    	serial_print(buf);
-    }
-    int tick = HAL_GetTick();
+	int tick = HAL_GetTick();
 #endif
 
-#ifdef TRANSMITTER
-  lora_reset();
-  HAL_Delay(10);
-
-  uint8_t version = lora_version();
-  if (version == 0x12) {
-	  set_led3();
-      serial_print("Initialisation du module LoRa...\r\n");
-
-      // Préparation pour la transmission
-      init_lora();  // Initialiser le module et envoyer les données
-
-      // Attendre que la transmission soit terminée
-      while (!lora_is_tx_done()) {
-          HAL_Delay(10);
-      }
-
-      serial_print("Transmission terminee!\r\n");
-
-      // Effacer les drapeaux d'interruption
-      lora_clear_irq();
-  } else {
-      serial_print("Module LoRa non detecte ou incompatible\r\n");
-  }
-#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -207,20 +180,8 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 #ifdef TRANSMITTER
-	//uint32_t current_time = HAL_GetTick();
-
-	// Vérifier si le module est prêt (pas en train d'émettre)
-	//if (!(read_register(0x01) & 0x07)) {  // Vérifier si le module est en mode veille
-	  send_lora_packet(TX_Buffer, sizeof(TX_Buffer) - 1);  // Ignorer le zéro terminal
-	  HAL_Delay(100);
-	  // serial_print("Paquet envoye\r\n");
-	//}
-
-	// Vérifier si une transmission est terminée
-	/*if (lora_is_tx_done()) {
-	  serial_print("Transmission terminee\r\n");
-	  lora_clear_irq();  // Effacer les drapeaux d'interruption
-	}*/
+	send_lora_packet(TX_Buffer, sizeof(TX_Buffer) - 1);  // Ignorer le zéro terminal
+	HAL_Delay(25);
 #endif
 #ifdef RECEIVER
   // Vérifier si un paquet est disponible
@@ -239,7 +200,7 @@ int main(void)
     }
   }
 
-  if (HAL_GetTick() - tick > 500)
+  if (HAL_GetTick() - tick > 50)
   {
 	  reset_led4();
   }
