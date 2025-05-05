@@ -1,0 +1,4 @@
+../Drivers/BSP/Components/otm8009a/otm8009a.c:162:13:DSI_IO_WriteCmd	16	static
+../Drivers/BSP/Components/otm8009a/otm8009a.c:173:16:DSI_IO_ReadCmd	24	static
+../Drivers/BSP/Components/otm8009a/otm8009a.c:188:9:OTM8009A_Init	16	static
+../Drivers/BSP/Components/otm8009a/otm8009a.c:435:10:OTM8009A_ReadID	16	static

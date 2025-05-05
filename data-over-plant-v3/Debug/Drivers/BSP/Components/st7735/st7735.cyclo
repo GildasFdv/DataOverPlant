@@ -1,0 +1,12 @@
+../Drivers/BSP/Components/st7735/st7735.c:106:6:st7735_Init	1
+../Drivers/BSP/Components/st7735/st7735.c:219:6:st7735_DisplayOn	1
+../Drivers/BSP/Components/st7735/st7735.c:236:6:st7735_DisplayOff	1
+../Drivers/BSP/Components/st7735/st7735.c:254:6:st7735_SetCursor	1
+../Drivers/BSP/Components/st7735/st7735.c:277:6:st7735_WritePixel	3
+../Drivers/BSP/Components/st7735/st7735.c:301:6:st7735_WriteReg	1
+../Drivers/BSP/Components/st7735/st7735.c:315:6:st7735_SetDisplayWindow	1
+../Drivers/BSP/Components/st7735/st7735.c:348:6:st7735_DrawHLine	3
+../Drivers/BSP/Components/st7735/st7735.c:372:6:st7735_DrawVLine	3
+../Drivers/BSP/Components/st7735/st7735.c:388:10:st7735_GetLcdPixelWidth	1
+../Drivers/BSP/Components/st7735/st7735.c:398:10:st7735_GetLcdPixelHeight	1
+../Drivers/BSP/Components/st7735/st7735.c:408:6:st7735_DrawBitmap	1

@@ -1,0 +1,13 @@
+../Drivers/BSP/Components/ov5640/ov5640.c:463:6:ov5640_Init	10
+../Drivers/BSP/Components/ov5640/ov5640.c:521:6:OV5640_SetLightMode	12
+../Drivers/BSP/Components/ov5640/ov5640.c:578:6:OV5640_SetEffect	14
+../Drivers/BSP/Components/ov5640/ov5640.c:666:6:OV5640_SetBrightness	14
+../Drivers/BSP/Components/ov5640/ov5640.c:736:6:OV5640_SetSaturation	13
+../Drivers/BSP/Components/ov5640/ov5640.c:806:6:OV5640_SetContrast	13
+../Drivers/BSP/Components/ov5640/ov5640.c:874:6:OV5640_SetHueDegree	20
+../Drivers/BSP/Components/ov5640/ov5640.c:968:6:OV5640_MirrorFlipConfig	5
+../Drivers/BSP/Components/ov5640/ov5640.c:1011:6:OV5640_ZoomConfig	5
+../Drivers/BSP/Components/ov5640/ov5640.c:1047:9:OV5640_GetResolution	9
+../Drivers/BSP/Components/ov5640/ov5640.c:1088:6:ov5640_Config	5
+../Drivers/BSP/Components/ov5640/ov5640.c:1123:10:ov5640_ReadID	1
+../Drivers/BSP/Components/ov5640/ov5640.c:1150:17:ov5640_ConvertValue	23

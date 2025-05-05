@@ -1,0 +1,12 @@
+../Core/Src/lora.c:10:6:init_lora_transmitter	16	static
+../Core/Src/lora.c:47:6:init_lora_receiver	8	static
+../Core/Src/lora.c:96:6:init_lora	8	static
+../Core/Src/lora.c:106:6:lora_reset	8	static
+../Core/Src/lora.c:114:9:lora_version	16	static
+../Core/Src/lora.c:121:9:lora_status	8	static
+../Core/Src/lora.c:126:6:lora_clear_irq	8	static
+../Core/Src/lora.c:131:6:lora_is_tx_done	8	static
+../Core/Src/lora.c:136:6:send_lora_packet	24	static
+../Core/Src/lora.c:157:6:lora_is_packet_available	16	static
+../Core/Src/lora.c:164:6:lora_has_crc_error	16	static
+../Core/Src/lora.c:171:14:lora_receive_packet	296	static
