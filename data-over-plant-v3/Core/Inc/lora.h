@@ -14,8 +14,8 @@
 
 #define LORA_NSS_GPIO_Port GPIOF
 #define LORA_NSS_Pin       GPIO_PIN_6
-#define LORA_RST_GPIO_Port GPIOC
-#define LORA_RST_Pin       GPIO_PIN_3
+#define LORA_RST_GPIO_Port GPIOF
+#define LORA_RST_Pin       GPIO_PIN_11
 
 typedef struct {
     uint8_t buffer[256];  // Buffer pour stocker les données reçues

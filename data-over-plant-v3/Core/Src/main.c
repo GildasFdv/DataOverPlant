@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2025 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -57,8 +57,8 @@ HCD_HandleTypeDef hhcd_USB_OTG_HS;
 SDRAM_HandleTypeDef hsdram1;
 
 /* USER CODE BEGIN PV */
-uint8_t TX_Buffer [] = "A" ;
-uint8_t RX_Buffer [1] ; // DATA to receive
+uint8_t TX_Buffer[] = "A";
+uint8_t RX_Buffer[1]; // DATA to receive
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -80,35 +80,99 @@ static void MX_USB_OTG_HS_HCD_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void serial_print(char* str)
-{
-	HAL_UART_Transmit(&huart1, (uint8_t *)str, strlen(str), HAL_MAX_DELAY);
+void serial_print(char *str) {
+	HAL_UART_Transmit(&huart1, (uint8_t*) str, strlen(str), HAL_MAX_DELAY);
 }
 
-void write_register(uint8_t addr, uint8_t value)
-{
-    uint8_t data[2];
-    data[0] = addr | 0x80; // bit 7 à 1 pour écriture
-    data[1] = value;
+void serial_printf(const char *format, ...) {
+	char buffer[256]; // Taille du buffer à ajuster selon vos besoins
+	va_list args;
 
-    HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_RESET); // NSS low
-    HAL_SPI_Transmit(&hspi5, data, 2, HAL_MAX_DELAY);
-    HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_SET);   // NSS high
+	va_start(args, format);
+	vsnprintf(buffer, sizeof(buffer), format, args);
+	va_end(args);
+
+	serial_print(buffer);
 }
 
-uint8_t read_register(uint8_t addr)
-{
-    uint8_t value = 0;
-    uint8_t reg_addr = addr & 0x7F; // bit 7 à 0 pour lecture (mask pour s'assurer que le bit 7 est à 0)
-
-    HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_RESET); // NSS low
-    HAL_SPI_Transmit(&hspi5, &reg_addr, 1, HAL_MAX_DELAY); // Envoyer l'adresse du registre
-    HAL_SPI_Receive(&hspi5, &value, 1, HAL_MAX_DELAY);     // Lire la valeur du registre
-    HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_SET);   // NSS high
-
-    return value;
+void serial_print_array(int *array) {
+	serial_print("[");
+	for (int i = 0; i < FIFO_LENGTH; i++) {
+		if (i != 0) {
+			serial_print(",");
+		}
+		serial_printf(" %d", array[i]);
+	}
+	serial_print("]\r\n");
 }
 
+void write_register(uint8_t addr, uint8_t value) {
+	uint8_t data[2];
+	data[0] = addr | 0x80; // bit 7 à 1 pour écriture
+	data[1] = value;
+
+	HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_RESET); // NSS low
+	HAL_SPI_Transmit(&hspi5, data, 2, HAL_MAX_DELAY);
+	HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_SET); // NSS high
+}
+
+uint8_t read_register(uint8_t addr) {
+	uint8_t value = 0;
+	uint8_t reg_addr = addr & 0x7F; // bit 7 à 0 pour lecture (mask pour s'assurer que le bit 7 est à 0)
+
+	HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_RESET); // NSS low
+	HAL_SPI_Transmit(&hspi5, &reg_addr, 1, HAL_MAX_DELAY); // Envoyer l'adresse du registre
+	HAL_SPI_Receive(&hspi5, &value, 1, HAL_MAX_DELAY); // Lire la valeur du registre
+	HAL_GPIO_WritePin(LORA_NSS_GPIO_Port, LORA_NSS_Pin, GPIO_PIN_SET); // NSS high
+
+	return value;
+}
+
+void ensure_lora_init() {
+	bool lora_init = false;
+	reset_led3();
+
+	while (!lora_init) {
+		lora_reset();
+		HAL_Delay(10);
+
+		uint8_t version = lora_version();
+		if (version == 0x12) {
+			set_led3();
+			init_lora();
+			lora_init = true;
+		} else {
+			reset_led3();
+		}
+	}
+}
+
+void dequeue(int *array, int new_element) {
+	for (int i = FIFO_LENGTH - 1; i > 0; i--) {
+		array[i] = array[i - 1];
+	}
+	array[0] = new_element;
+}
+
+int sum(int *array) {
+	int sum = 0;
+	for (int i = 0; i < FIFO_LENGTH; i++) {
+		sum += array[i];
+	}
+	return sum;
+}
+
+bool is_reliable(int *array) {
+	int diffs[FIFO_LENGTH];
+	diffs[FIFO_LENGTH - 1] = HAL_GetTick() - array[0];
+	for (int i = 0; i < FIFO_LENGTH - 1; i++) {
+		diffs[i] = array[i] - array[i + 1];
+	}
+	serial_print_array(diffs);
+	int diffs_sum = sum(diffs);
+	serial_printf("diffs sum: %d\r\n", diffs_sum);
+	return diffs_sum < (FIFO_LENGTH - 1) * 33 + 16;
+}
 /* USER CODE END 0 */
 
 /**
@@ -150,32 +214,21 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USB_OTG_HS_HCD_Init();
   /* USER CODE BEGIN 2 */
-  reset_led4();
-  reset_led3();
+	reset_led4();
+	reset_led3();
 
-	bool lora_init = false;
-
-	while (!lora_init) {
-		lora_reset();
-		HAL_Delay(10);
-
-		uint8_t version = lora_version();
-		if (version == 0x12) {
-			set_led3();
-			init_lora();
-			lora_init = true;
-		}
-	}
+	ensure_lora_init();
+	HAL_Delay(10 * 1000);
 #ifdef RECEIVER
-	int tick = HAL_GetTick();
+	int ticks[FIFO_LENGTH] = { HAL_GetTick() };
+	int lora_init_tick = HAL_GetTick();
 #endif
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+	while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -184,30 +237,34 @@ int main(void)
 	HAL_Delay(25);
 #endif
 #ifdef RECEIVER
-  // Vérifier si un paquet est disponible
-  if (lora_is_packet_available()) {
-    // Lire le paquet
-    LoRaPacket_t packet = lora_receive_packet();
+		// Vérifier si un paquet est disponible
+		if (lora_is_packet_available()) {
+			// Lire le paquet
+			LoRaPacket_t packet = lora_receive_packet();
 
-    // Traiter les données reçues (par exemple, le premier octet peut être un ID)
-    if (packet.size > 0) {
-      // Exemple: allumez une LED si le premier octet est 'A'
-      if (packet.buffer[0] == 'A') {
-    	  set_led4();
-    	  tick = HAL_GetTick();
-    	  serial_print("r");
-      }
-    }
-  }
+			// Traiter les données reçues (par exemple, le premier octet peut être un ID)
+			if (packet.size > 0) {
+				// Exemple: allumez une LED si le premier octet est 'A'
+				if (packet.buffer[0] == 'A') {
+					set_led4();
+					dequeue(ticks, HAL_GetTick());
+				}
+			}
+		}
 
-  if (HAL_GetTick() - tick > 50)
-  {
-	  reset_led4();
-  }
+		if (/*ticks[0] - HAL_GetTick() > 50*/!is_reliable(ticks)) {
+			reset_led4();
+		}
 
-  HAL_Delay(10); // Petit délai pour ne pas surcharger le processeur
+		if (HAL_GetTick() - ticks[0] > 1000
+				&& HAL_GetTick() - lora_init_tick > 1000) {
+			lora_init_tick = HAL_GetTick();
+			ensure_lora_init();
+		}
+
+		HAL_Delay(10); // Petit délai pour ne pas surcharger le processeur
 #endif
-  }
+	}
   /* USER CODE END 3 */
 }
 
@@ -600,7 +657,7 @@ static void MX_FMC_Init(void)
   /* hsdram1.Init */
   hsdram1.Init.SDBank = FMC_SDRAM_BANK2;
   hsdram1.Init.ColumnBitsNumber = FMC_SDRAM_COLUMN_BITS_NUM_8;
-  hsdram1.Init.RowBitsNumber = FMC_SDRAM_ROW_BITS_NUM_12;
+  hsdram1.Init.RowBitsNumber = FMC_SDRAM_ROW_BITS_NUM_11;
   hsdram1.Init.MemoryDataWidth = FMC_SDRAM_MEM_BUS_WIDTH_16;
   hsdram1.Init.InternalBankNumber = FMC_SDRAM_INTERN_BANKS_NUM_4;
   hsdram1.Init.CASLatency = FMC_SDRAM_CAS_LATENCY_3;
@@ -640,17 +697,17 @@ static void MX_GPIO_Init(void)
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
-  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6|GPIO_PIN_11|GPIO_PIN_13, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, NCS_MEMS_SPI_Pin|CSX_Pin|GPIO_PIN_3|OTG_FS_PSO_Pin, GPIO_PIN_RESET);
@@ -664,8 +721,14 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, LD3_Pin|LD4_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : PF6 */
-  GPIO_InitStruct.Pin = GPIO_PIN_6;
+  /*Configure GPIO pin : PE3 */
+  GPIO_InitStruct.Pin = GPIO_PIN_3;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PF6 PF11 PF13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_11|GPIO_PIN_13;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -761,11 +824,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1) {
+	}
   /* USER CODE END Error_Handler_Debug */
 }
 

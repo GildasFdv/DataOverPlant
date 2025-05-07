@@ -32,6 +32,9 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include "led.h"
 #include "lora.h"
 /* USER CODE END Includes */
@@ -117,12 +120,8 @@ void Error_Handler(void);
 #define R6_GPIO_Port GPIOB
 #define BOOT1_Pin GPIO_PIN_2
 #define BOOT1_GPIO_Port GPIOB
-#define SDNRAS_Pin GPIO_PIN_11
-#define SDNRAS_GPIO_Port GPIOF
 #define A6_Pin GPIO_PIN_12
 #define A6_GPIO_Port GPIOF
-#define A7_Pin GPIO_PIN_13
-#define A7_GPIO_Port GPIOF
 #define A8_Pin GPIO_PIN_14
 #define A8_GPIO_Port GPIOF
 #define A9_Pin GPIO_PIN_15
@@ -247,9 +246,15 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 #define TRANSMITTER
 //#define RECEIVER
+#define FIFO_LENGTH 16
 void write_register(uint8_t addr, uint8_t value);
 uint8_t read_register(uint8_t addr);
 void serial_print(char* str);
+void ensure_lora_init();
+void ensure_lora_init();
+void dequeue(int* array, int new_element);
+int sum(int* array);
+bool is_reliable(int* array);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
